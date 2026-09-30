@@ -1,0 +1,29 @@
+# =====================================================================
+#  Supabase project config.
+#
+#  The functions section below is the important part: it pins JWT
+#  verification per function so the setting lives in version control
+#  rather than in whoever last typed the deploy command.
+#
+#  Getting this backwards is a real failure in both directions:
+#    - verify_jwt = true on the webhook  -> PayPal gets 401 on every
+#      delivery, payments silently never unlock anything
+#    - verify_jwt = false on the others  -> create-order and
+#      capture-order become callable by anyone, with no signed-in user
+# =====================================================================
+
+project_id = "pbcavxhqpnqnasscmedc"
+
+[functions.create-order]
+# Browser-called on behalf of a signed-in student.
+verify_jwt = true
+
+[functions.capture-order]
+# Browser-called on behalf of a signed-in student.
+verify_jwt = true
+
+[functions.paypal-webhook]
+# Called by PayPal, which has no Supabase token. Publicly reachable by
+# necessity — verifyWebhookSignature() in _shared/paypal.ts is what makes
+# it safe, so do not remove that check.
+verify_jwt = false

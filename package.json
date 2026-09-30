@@ -1,0 +1,27 @@
+{
+  "name": "katsat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KatSAT \u2014 katsat.org. TypeScript sources in src/, built to public/.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs --watch --serve",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "test": "node scripts/test.mjs"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.47.0",
+    "@types/katex": "^0.16.8",
+    "katex": "^0.18.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  }
+}

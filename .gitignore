@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+._*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Secrets — the service role key and PayPal credentials belong in
+# Supabase / Cloudflare environment variables, never in this repo.
+.env
+.env.*
+!.env.example
+*.local
+secrets/
+
+# Supabase CLI local state
+.branches/
+.temp/
+supabase/.temp/
+
+# Node
+node_modules/
+
+# Build output. Everything in public/ is generated from src/ by
+# scripts/build.mjs — never edit it directly, and never commit it.
+# Cloudflare Pages rebuilds it from source on every deploy.
+/public/
+
+# Agent tooling (ECC). ~6MB of vendored rules and skills; the repo is
+# 3MB without it. Delete this line if you'd rather version it.
+.claude/
+
+# Generated question bank — rebuild with scripts/import-onward.py
+supabase/seed-onward.sql
+supabase/onward/
+supabase/math/

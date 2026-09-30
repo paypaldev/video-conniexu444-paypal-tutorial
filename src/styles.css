@@ -1,0 +1,1356 @@
+/* =====================================================================
+   KatSAT — design system
+   Light mode only, on purpose. No dark variants anywhere below.
+
+   Structure:
+     1. Tokens        — the only place raw values live
+     2. Base          — reset + document defaults
+     3. Primitives    — buttons, tags, fields
+     4. Components    — header, sets, question, dialogs
+     5. Responsive
+
+   Rule of thumb: if you are about to type a hex code, a pixel value, or
+   a font size outside section 1, add a token instead. That is what keeps
+   this consistent as the app grows.
+   ===================================================================== */
+
+
+/* =====================================================================
+   1. TOKENS
+   ===================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Neutral ramp -------------------------------------------------
+     Very slightly warm, so large white areas do not feel clinical.
+     Named by role, not by number, so usage stays intentional.        */
+  --paper:        #ffffff;   /* cards, dialogs, inputs                */
+  --canvas:       #faf9f7;   /* page background                       */
+  --sunken:       #f3f1ed;   /* passages, progress track, hover fills */
+  --line:         #e8e5df;   /* hairline borders — the default        */
+  --line-strong:  #d5d1c8;   /* borders that need to be seen          */
+
+  /* All three clear WCAG AA (4.5:1) on paper, canvas, and sunken.
+     Contrast on paper: 17.2 / 7.3 / 5.2. Do not lighten these — the
+     obvious "softer gray" for metadata lands around 2.9:1 and fails. */
+  --ink:          #171614;   /* headings, primary text                */
+  --ink-muted:    #5c564a;   /* secondary text, labels                */
+  --ink-faint:    #736c5e;   /* metadata, placeholders                */
+
+  /* ---- Accent -------------------------------------------------------
+     One accent for the whole product. Change these three lines and the
+     entire app re-skins.                                             */
+  --accent:       #1c5c4c;
+  --accent-hover: #164a3d;
+  --accent-wash:  #e9f0ed;
+  --google-blue:  #4285f4;
+
+  /* ---- Activity shades ----------------------------------------------
+     Five steps from "nothing" to the full accent, for the contribution
+     chart. Spaced by lightness rather than by opacity so a square keeps
+     its colour whatever sits behind it.                               */
+  --level-0: #f0eeea;
+  --level-1: #cfe0d9;
+  --level-2: #9cc3b6;
+  --level-3: #5b9583;
+  --level-4: var(--accent);
+
+  /* ---- Semantic ---------------------------------------------------- */
+  --correct:      #1c6b46;
+  --correct-wash: #e8f3ec;
+  --wrong:        #a1352a;
+  --wrong-wash:   #fbeae7;
+  --notice:       #7a5c12;
+
+  /* ---- Type ---------------------------------------------------------
+     Six sizes. Resisting a seventh is most of what keeps a UI clean. */
+  --font: ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --text-xs:   0.75rem;    /* 12 — tags, footnotes        */
+  --text-sm:   0.8125rem;  /* 13 — metadata, helper text  */
+  --text-md:   0.9375rem;  /* 15 — secondary body         */
+  --text-base: 1rem;       /* 16 — body, choices          */
+  --text-lg:   1.125rem;   /* 18 — question stems         */
+  --text-xl:   1.375rem;   /* 22 — dialog titles          */
+  --text-2xl:  2rem;       /* 32 — page heading           */
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semi:   600;
+  --weight-bold:   700;
+
+  --leading-tight: 1.2;
+  --leading-snug:  1.45;
+  --leading-body:  1.6;
+
+  --tracking-tight: -0.02em;
+  --tracking-wide:   0.06em;
+
+  /* ---- Space --------------------------------------------------------
+     4px base. Use these rather than arbitrary margins.               */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-14: 56px;
+  --space-18: 72px;
+
+  /* ---- Radius ------------------------------------------------------- */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-full: 999px;
+
+  /* ---- Elevation ----------------------------------------------------
+     Minimal look leans on hairlines, not shadows. Exactly one shadow
+     exists, reserved for things floating above the page.             */
+  --shadow-overlay: 0 16px 48px rgba(23, 22, 20, 0.16);
+
+  /* ---- Motion ------------------------------------------------------- */
+  --dur:  140ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.36, 0.64, 1);  /* slight overshoot */
+  --dur-celebrate: 620ms;
+
+  /* ---- Layout ------------------------------------------------------- */
+  --measure: 680px;   /* max line length for reading comfort */
+  --gutter:  var(--space-5);
+
+  /* ---- Focus --------------------------------------------------------
+     One focus treatment everywhere. Never remove it.                 */
+  --focus-ring: 2px solid var(--accent);
+  --focus-offset: 2px;
+}
+
+
+/* =====================================================================
+   2. BASE
+   ===================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* The app toggles visibility via the `hidden` property. Class selectors
+   like .btn out-specify the UA's [hidden] rule, so state this once and
+   loudly — without it, hidden buttons render. */
+[hidden] { display: none !important; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-semi);
+  margin: 0;
+}
+
+/* One focus style for every interactive element. */
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-8) var(--gutter) var(--space-18);
+}
+
+
+/* =====================================================================
+   3. PRIMITIVES
+   ===================================================================== */
+
+/* ---- Screen-reader-only text ----------------------------------------
+   For labels that a reader needs and the layout does not have room for:
+   the weekday names on the activity grid, mostly. `display: none` would
+   hide it from assistive tech too, which is the opposite of the point. */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Button --------------------------------------------------------
+   Two variants only: primary (one per view) and ghost (everything
+   else). A third variant is almost always a sign the layout is doing
+   too much.                                                          */
+
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--ink);
+  --btn-border: transparent;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font: inherit;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  line-height: 1.2;
+  padding: 10px var(--space-4);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--radius-md);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease),
+              border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  --btn-bg: var(--accent);
+  --btn-fg: var(--paper);
+  --btn-border: var(--accent);
+}
+.btn-primary:not(:disabled):hover {
+  --btn-bg: var(--accent-hover);
+  --btn-border: var(--accent-hover);
+}
+
+.btn-ghost {
+  --btn-fg: var(--ink-muted);
+  --btn-border: var(--line);
+}
+.btn-ghost:hover {
+  --btn-bg: var(--sunken);
+  --btn-fg: var(--ink);
+  --btn-border: var(--line-strong);
+}
+
+.btn-block { width: 100%; }
+.btn-back  { padding-inline: var(--space-3); }
+.btn-calc  { padding-inline: var(--space-3); }
+
+/* Inline text button. */
+.linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.linkish:hover { color: var(--accent-hover); }
+
+/* ---- Tag ------------------------------------------------------------ */
+
+.tag {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  line-height: 1.6;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.tag-free   { background: var(--accent-wash); color: var(--accent); }
+.tag-locked { background: var(--sunken);      color: var(--ink-faint); }
+
+/* ---- Field ---------------------------------------------------------- */
+
+.field { display: block; margin-bottom: var(--space-4); }
+
+.field span {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--ink-muted);
+  margin-bottom: var(--space-1);
+}
+
+.field input {
+  width: 100%;
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  padding: 10px var(--space-3);
+  transition: border-color var(--dur) var(--ease);
+}
+.field input::placeholder { color: var(--ink-faint); }
+.field input:hover { border-color: var(--ink-faint); }
+
+/* ---- Inline messages ------------------------------------------------ */
+
+.form-error,
+.form-notice {
+  font-size: var(--text-md);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  margin: 0 0 var(--space-3);
+}
+.form-error  { color: var(--wrong);   background: var(--wrong-wash); }
+.form-notice { color: var(--correct); background: var(--correct-wash); }
+
+
+/* =====================================================================
+   4. COMPONENTS
+   ===================================================================== */
+
+/* ---- Banner --------------------------------------------------------- */
+
+.banner {
+  background: var(--notice);
+  color: var(--paper);
+  padding: var(--space-2) var(--gutter);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+.banner code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Header --------------------------------------------------------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-5) var(--gutter);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  text-decoration: none;
+  color: var(--ink);
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-tight);
+}
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: block;
+  /* Nudged down so the mark's optical centre lines up with the baseline
+     of the wordmark rather than its box. */
+  align-self: center;
+  margin-right: var(--space-1);
+}
+
+.brand-mark { font-weight: var(--weight-bold); color: var(--accent); }
+.brand-name { font-weight: var(--weight-medium); }
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* The link to the profile page. Reads as an identity chip rather than a
+   button, because it is showing you who you are as much as offering a
+   destination. */
+.profile-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: inherit;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
+  min-width: 0;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.profile-link:hover {
+  background: var(--sunken);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.profile-link-avatar {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--accent-wash);
+  color: var(--accent);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+}
+
+.profile-link-name {
+  font-size: var(--text-sm);
+  max-width: 18ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Hero ----------------------------------------------------------- */
+
+.hero { margin-bottom: var(--space-10); }
+
+.hero h1 {
+  font-size: clamp(1.625rem, 5vw, var(--text-2xl));
+  margin-bottom: var(--space-3);
+}
+
+.hero-sub {
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+  margin: 0;
+  max-width: 48ch;
+}
+
+/* ---- Set list -------------------------------------------------------
+   Cards are defined by a hairline and generous padding, not a shadow. */
+
+.set-list { display: grid; gap: var(--space-3); }
+
+.set-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+.set-card:hover { border-color: var(--line-strong); }
+
+.set-card-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.set-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--tracking-tight);
+}
+
+.set-desc {
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+  margin: 0;
+}
+
+.set-meta {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+.set-card.locked .set-title { color: var(--ink-muted); }
+
+/* ---- Split view with the calculator ---------------------------------
+   `main` is capped at --measure for reading comfort. With the calculator
+   open that cap has to lift, or two columns would each be unusably
+   narrow — so the split escapes the container rather than dividing it. */
+
+.view-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+
+  width: calc(100vw - var(--space-8));
+  max-width: 1500px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.practice-main { min-width: 0; }
+
+.calc-pane {
+  position: sticky;
+  top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  /* Tall enough to be a real calculator, short enough that the submit
+     button stays reachable without scrolling. */
+  height: min(78vh, 760px);
+}
+
+.calc-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--line);
+  background: var(--sunken);
+}
+
+.calc-title {
+  flex: 1;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semi);
+  color: var(--ink-muted);
+}
+
+.calc-frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  display: block;
+}
+
+.calc-fallback {
+  flex: 1;
+  display: grid;
+  place-content: center;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+}
+
+/* Below this width two columns stop being readable, so the calculator
+   stacks under the question instead. */
+@media (max-width: 900px) {
+  .view-split {
+    grid-template-columns: minmax(0, 1fr);
+    width: auto;
+    left: auto;
+    transform: none;
+  }
+  .calc-pane { position: static; height: 60vh; }
+}
+
+/* ---- Coming-soon note -----------------------------------------------
+   Sits below the set list. Dashed border and no background so it reads
+   as a placeholder for a future card rather than as another set you
+   could click.                                                        */
+
+.upcoming {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: var(--space-5);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+}
+
+.upcoming-text {
+  margin: 0;
+  font-size: var(--text-md);
+  color: var(--ink-muted);
+}
+.upcoming-text strong {
+  color: var(--ink);
+  font-weight: var(--weight-semi);
+}
+
+@media (max-width: 460px) {
+  .upcoming { flex-direction: column; gap: var(--space-2); }
+}
+
+/* ---- Practice header ------------------------------------------------ */
+
+.practice-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.progress { flex: 1; min-width: 0; }
+
+.q-counter {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+  text-align: right;
+  margin-bottom: var(--space-2);
+}
+
+.progress-track {
+  height: 3px;
+  background: var(--sunken);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width 250ms var(--ease);
+}
+
+/* ---- Question ------------------------------------------------------- */
+
+.question-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+}
+
+.q-passage {
+  background: var(--sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: 0 0 var(--space-6);
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+.q-stem {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--space-6);
+}
+
+.q-choices { display: grid; gap: var(--space-2); }
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+.choice:hover:not(:disabled) { border-color: var(--line-strong); }
+.choice:disabled { cursor: default; }
+
+.choice-label {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  color: var(--ink-muted);
+  transition: background var(--dur) var(--ease),
+              border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease);
+}
+
+/* Selection and result share one shape; only the hue changes. */
+.choice.selected              { border-color: var(--accent); background: var(--accent-wash); }
+.choice.selected .choice-label{ background: var(--accent); border-color: var(--accent); color: var(--paper); }
+
+.choice.is-correct               { border-color: var(--correct); background: var(--correct-wash); }
+.choice.is-correct .choice-label { background: var(--correct); border-color: var(--correct); color: var(--paper); }
+
+.choice.is-wrong                 { border-color: var(--wrong); background: var(--wrong-wash); }
+.choice.is-wrong .choice-label   { background: var(--wrong); border-color: var(--wrong); color: var(--paper); }
+
+/* ---- Feedback ------------------------------------------------------- */
+
+.feedback {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--sunken);
+}
+.feedback.correct { background: var(--correct-wash); }
+.feedback.wrong   { background: var(--wrong-wash); }
+
+.feedback-verdict {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semi);
+}
+.feedback.correct .feedback-verdict { color: var(--correct); }
+.feedback.wrong   .feedback-verdict { color: var(--wrong); }
+
+.feedback-explanation {
+  margin: 0;
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+/* ---- Celebration ----------------------------------------------------
+   Fires only on a correct answer. Deliberately short and small: this
+   runs dozens of times per study session, so anything showy would get
+   annoying by question ten. Every piece is motion-only — the answer is
+   still fully legible with animation disabled.                       */
+
+@keyframes ds-pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes ds-badge-in {
+  0%   { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes ds-check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes ds-rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes ds-spark {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+}
+
+.feedback.correct { animation: ds-rise-in 260ms var(--ease) both; }
+
+.choice.is-correct {
+  animation: ds-pop 420ms var(--ease-out-back) both;
+}
+
+/* Check badge that draws itself next to the verdict. */
+.verdict-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.check-badge {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--correct);
+  display: grid;
+  place-items: center;
+  animation: ds-badge-in 300ms var(--ease-out-back) both;
+}
+.check-badge svg { display: block; }
+.check-badge path {
+  stroke: var(--paper);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 16;
+  stroke-dashoffset: 16;
+  animation: ds-check-draw 260ms var(--ease) 140ms both;
+}
+
+/* Streak chip — appears from two in a row, so it means something. */
+.streak-chip {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--correct);
+  background: var(--paper);
+  border-radius: var(--radius-full);
+  padding: 2px var(--space-2);
+  white-space: nowrap;
+  animation: ds-badge-in 300ms var(--ease-out-back) 120ms both;
+}
+
+/* Particle burst. Fixed-position layer, removed as soon as it finishes. */
+.burst {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+.burst i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 1px;
+  animation: ds-spark var(--dur-celebrate) var(--ease) both;
+}
+
+.question-actions { margin-top: var(--space-6); }
+
+.signin-nudge {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+/* ---- Set complete --------------------------------------------------- */
+
+.set-complete {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-14) var(--space-8);
+  text-align: center;
+}
+
+.set-complete h2 {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-2);
+}
+
+.set-score {
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+  margin: 0 0 var(--space-6);
+}
+
+.set-complete-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---- Dialog --------------------------------------------------------- */
+
+.dialog {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0;
+  width: min(420px, calc(100vw - var(--space-8)));
+  box-shadow: var(--shadow-overlay);
+}
+.dialog::backdrop { background: rgba(23, 22, 20, 0.4); }
+
+.dialog-body {
+  position: relative;
+  padding: var(--space-8);
+}
+
+.dialog-body h2 {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-2);
+}
+
+.dialog-sub {
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+  margin: 0 0 var(--space-6);
+}
+
+.btn-google {
+  --btn-bg: var(--paper);
+  --btn-fg: var(--ink);
+  --btn-border: var(--line-strong);
+  position: relative;
+}
+.btn-google:not(:disabled):hover { --btn-bg: var(--sunken); }
+
+.google-mark {
+  position: absolute;
+  left: var(--space-4);
+  color: var(--google-blue);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semi);
+}
+
+.dialog-close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.dialog-close:hover { background: var(--sunken); color: var(--ink); }
+
+.dialog-foot {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* ---- Paywall -------------------------------------------------------- */
+
+.perk-list {
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  list-style: none;
+  color: var(--ink-muted);
+  font-size: var(--text-md);
+}
+.perk-list li {
+  position: relative;
+  padding-left: var(--space-5);
+  margin-bottom: var(--space-2);
+}
+.perk-list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.65em;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+}
+
+.price {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--space-4);
+}
+
+/* v6 <paypal-button> is a web component. Width only — PayPal owns the
+   gold mark and label. */
+paypal-button {
+  display: block;
+  width: 100%;
+  min-height: 45px;
+}
+
+/* ---- Typeset maths ---------------------------------------------------
+   KaTeX emits MathML, which the browser renders with its own maths
+   font. Only two things need saying here: keep it on the surrounding
+   text's size (browsers default <math> a little large), and stop a long
+   expression from widening the question card on a phone. */
+
+.math math {
+  /* MathML renders visually smaller than the surrounding text, and an
+     exponent is a superscript of that — at 1em a squared sign is hard to
+     tell from a stray mark, which is not a distinction to leave to
+     chance in a maths test. */
+  font-size: 1.15em;
+  line-height: 1.2;
+}
+
+.math {
+  /* An expression is a unit — breaking one across lines mid-fraction is
+     worse than letting the rare long one scroll. */
+  white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  vertical-align: middle;
+}
+
+/* Fractions need room to breathe inside a tapped choice button. */
+.choice .math { padding-block: 2px; }
+
+
+/* ---- Profile --------------------------------------------------------
+   Identity first, then the numbers, then the calendar. Same hairline
+   card as the set list — the profile page is part of the app, not a
+   separate skin.                                                      */
+
+.section-heading {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+.profile-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* The open form is several rows tall; centring the avatar against it
+   leaves it floating halfway down the card. */
+.profile-identity.is-editing { align-items: flex-start; }
+
+.profile-avatar {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--accent-wash);
+  color: var(--accent);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+}
+
+/* min-width: 0 so a long name ellipsises instead of pushing the Edit
+   button off the card. */
+.profile-names {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-email {
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+  margin: var(--space-1) 0 0;
+  overflow-wrap: anywhere;
+}
+
+.name-form .field { margin-bottom: var(--space-2); }
+
+.field-hint {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-3);
+}
+
+.field-count { font-variant-numeric: tabular-nums; }
+
+.name-form-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* ---- Stat tiles ------------------------------------------------------
+   auto-fit rather than a fixed four columns: the row reflows to two-up
+   on a phone without a second breakpoint.                             */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+/* A live streak is the one number on the page worth colouring. */
+.stat-live {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+.stat-live .stat-value { color: var(--accent); }
+
+.stat-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.stat-value {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-unit {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--ink-muted);
+  margin-left: var(--space-1);
+}
+
+.stat-note {
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+}
+
+/* ---- Activity chart --------------------------------------------------
+   A year of squares. The table collapses its borders and controls
+   spacing with border-spacing so every gap is identical — margins on
+   the cells would not survive the table layout.                       */
+
+.activity { margin-bottom: var(--space-8); }
+
+.activity-head { margin-bottom: var(--space-4); }
+
+.activity-sub {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  margin: var(--space-1) 0 0;
+}
+
+.activity-scroll {
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.activity-grid {
+  border-collapse: separate;
+  border-spacing: 3px;
+  table-layout: fixed;
+}
+
+/* The weekday gutter is pinned. The grid opens scrolled to the most
+   recent week, so a column that scrolled with the squares would start
+   off-screen — the labels would only appear after scrolling back to
+   last autumn, which is the one time nobody needs them. Sticky keeps
+   them beside whichever weeks are showing. The background is what stops
+   squares from sliding visibly underneath. */
+.activity-grid th:first-child,
+.activity-weekday {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: 34px;
+  background: var(--canvas);
+}
+
+/* Fills the corner cell and hides whatever has been scrolled under it.
+   Positioned with a z-index so it lands above the month labels, which
+   are positioned too — a plain background on the cell would paint in
+   the table's background layer, below every cell's content. */
+.activity-corner .activity-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--canvas);
+}
+
+.activity-weekday {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-normal);
+  color: var(--ink-faint);
+  text-align: right;
+  padding-right: var(--space-1);
+  white-space: nowrap;
+}
+
+.activity-month {
+  position: relative;   /* anchors the overflowing label below */
+  font-size: var(--text-xs);
+  font-weight: var(--weight-normal);
+  color: var(--ink-faint);
+  text-align: left;
+  padding-bottom: var(--space-1);
+  /* Every cell in this row holds an absolutely positioned label, which
+     takes no space — without a height the row collapses, the labels
+     spill outside it, and the corner cover has nothing to fill. */
+  height: 16px;
+}
+
+/* The label is wider than its column, so it overflows to the right
+   rather than stretching the week it sits above. Pinned to the cell's
+   top-left corner rather than left to its static position: centred in
+   the row it would sit a pixel or two proud of the cell box, and the
+   corner cover — which is exactly the cell box — would clip its top
+   instead of hiding it. */
+.activity-month-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.activity-cell {
+  padding: 0;
+  width: 11px;
+  height: 11px;
+}
+
+.activity-day {
+  display: block;
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--level-0);
+  /* A hairline keeps the palest squares visible against the page. */
+  outline: 1px solid rgba(23, 22, 20, 0.05);
+  outline-offset: -1px;
+}
+
+.activity-day[data-level="1"] { background: var(--level-1); }
+.activity-day[data-level="2"] { background: var(--level-2); }
+.activity-day[data-level="3"] { background: var(--level-3); }
+.activity-day[data-level="4"] { background: var(--level-4); }
+
+.activity-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+.activity-legend span:first-child { margin-right: var(--space-1); }
+.activity-legend span:last-child  { margin-left:  var(--space-1); }
+
+/* ---- Per-set breakdown ----------------------------------------------- */
+
+.profile-sets { margin-bottom: var(--space-8); }
+
+.progress-list {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+}
+
+.progress-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--line);
+}
+.progress-row:last-child { border-bottom: 0; }
+
+.progress-row-title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.progress-row-count {
+  font-size: var(--text-sm);
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ---- Footer --------------------------------------------------------- */
+
+.site-footer {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-6) var(--gutter) var(--space-10);
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint);
+  font-size: var(--text-sm);
+}
+
+
+/* =====================================================================
+   5. RESPONSIVE
+   ===================================================================== */
+
+@media (max-width: 560px) {
+  :root { --gutter: var(--space-4); }
+
+  /* The avatar still identifies who is signed in, so only the name
+     itself goes — the header has to leave room for Sign out. */
+  .profile-link-name { display: none; }
+
+  .question-card { padding: var(--space-5); }
+  .set-complete  { padding: var(--space-10) var(--space-5); }
+  .dialog-body   { padding: var(--space-6); }
+  .hero          { margin-bottom: var(--space-8); }
+
+  .profile-card  { padding: var(--space-4); }
+
+  /* Stack the identity block: 48px avatar + name + Edit button do not
+     fit on one line at this width. */
+  .profile-identity {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .profile-names { flex-basis: 100%; }
+}

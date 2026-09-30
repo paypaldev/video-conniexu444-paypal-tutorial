@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>KatSAT — Design System</title>
+
+  <!-- Deliberately loads the real stylesheet. If something looks wrong
+       here, it is wrong in the app too. -->
+  <link rel="stylesheet" href="../public/styles.css" />
+
+  <style>
+    /* Page chrome for this reference only — not part of the system. */
+    body { padding-bottom: var(--space-18); }
+    .ds-wrap { max-width: 860px; margin: 0 auto; padding: var(--space-10) var(--gutter); }
+    .ds-head { margin-bottom: var(--space-14); }
+    .ds-head h1 { font-size: var(--text-2xl); margin-bottom: var(--space-3); }
+    .ds-head p { color: var(--ink-muted); max-width: 60ch; margin: 0; }
+
+    .ds-section { margin-bottom: var(--space-14); }
+    .ds-section > h2 {
+      font-size: var(--text-lg);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--line);
+      margin-bottom: var(--space-5);
+    }
+    .ds-note {
+      color: var(--ink-muted);
+      font-size: var(--text-md);
+      max-width: 62ch;
+      margin: 0 0 var(--space-5);
+    }
+
+    .ds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: var(--space-3);
+    }
+    .ds-swatch {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--paper);
+    }
+    .ds-chip { height: 56px; }
+    .ds-swatch dl { margin: 0; padding: var(--space-3); }
+    .ds-swatch dt {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink);
+    }
+    .ds-swatch dd {
+      margin: 2px 0 0;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink-faint);
+      text-transform: uppercase;
+    }
+
+    .ds-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-4);
+    }
+    .ds-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+    }
+    .ds-label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink-faint);
+      margin-bottom: var(--space-2);
+    }
+    .ds-scale-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-4);
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .ds-scale-row code {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink-faint);
+      min-width: 12ch;
+    }
+    .ds-bar { background: var(--accent-wash); border-radius: 2px; height: 14px; }
+
+    .ds-rules { margin: 0; padding-left: var(--space-5); color: var(--ink-muted); }
+    .ds-rules li { margin-bottom: var(--space-2); max-width: 62ch; }
+    .ds-rules strong { color: var(--ink); font-weight: var(--weight-semi); }
+  </style>
+</head>
+<body>
+
+<div class="ds-wrap">
+
+  <header class="ds-head">
+    <h1>KatSAT Design System</h1>
+    <p>
+      Light mode only. Every value below is a CSS custom property defined in
+      section 1 of <code>public/styles.css</code> — this page loads that same
+      file, so it can never drift from the app.
+    </p>
+  </header>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Principles</h2>
+    <ol class="ds-rules">
+      <li><strong>Hairlines, not shadows.</strong> Exactly one shadow token exists and it is reserved for dialogs. Everything else is separated by a 1px border.</li>
+      <li><strong>One accent.</strong> A single green carries brand, primary action, and selection. Color elsewhere means something specific: correct or wrong.</li>
+      <li><strong>Six type sizes.</strong> Adding a seventh is almost always solvable with weight or color instead.</li>
+      <li><strong>One primary button per view.</strong> If two things look equally important, neither reads as important.</li>
+      <li><strong>Space on a 4px grid.</strong> Use the tokens; arbitrary margins are what make a UI feel loose.</li>
+    </ol>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Color</h2>
+    <p class="ds-note">
+      Neutrals are very slightly warm so large white areas do not feel
+      clinical. Change the three accent tokens and the whole product re-skins.
+    </p>
+
+    <span class="ds-label">Surfaces</span>
+    <div class="ds-grid" style="margin-bottom: var(--space-5)">
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--paper)"></div><dl><dt>--paper</dt><dd>#ffffff</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--canvas)"></div><dl><dt>--canvas</dt><dd>#faf9f7</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--sunken)"></div><dl><dt>--sunken</dt><dd>#f3f1ed</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--line)"></div><dl><dt>--line</dt><dd>#e8e5df</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--line-strong)"></div><dl><dt>--line-strong</dt><dd>#d5d1c8</dd></dl></div>
+    </div>
+
+    <span class="ds-label">Text</span>
+    <div class="ds-grid" style="margin-bottom: var(--space-5)">
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--ink)"></div><dl><dt>--ink</dt><dd>#171614</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--ink-muted)"></div><dl><dt>--ink-muted</dt><dd>#5c564a</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--ink-faint)"></div><dl><dt>--ink-faint</dt><dd>#736c5e</dd></dl></div>
+    </div>
+
+    <span class="ds-label">Accent &amp; semantic</span>
+    <div class="ds-grid">
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--accent)"></div><dl><dt>--accent</dt><dd>#1c5c4c</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--accent-wash)"></div><dl><dt>--accent-wash</dt><dd>#e9f0ed</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--correct)"></div><dl><dt>--correct</dt><dd>#1c6b46</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--correct-wash)"></div><dl><dt>--correct-wash</dt><dd>#e8f3ec</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--wrong)"></div><dl><dt>--wrong</dt><dd>#a1352a</dd></dl></div>
+      <div class="ds-swatch"><div class="ds-chip" style="background: var(--wrong-wash)"></div><dl><dt>--wrong-wash</dt><dd>#fbeae7</dd></dl></div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Type scale</h2>
+    <div class="ds-panel">
+      <div class="ds-scale-row"><code>--text-2xl</code><span style="font-size: var(--text-2xl); font-weight: var(--weight-semi); letter-spacing: var(--tracking-tight)">Page heading</span></div>
+      <div class="ds-scale-row"><code>--text-xl</code><span style="font-size: var(--text-xl); font-weight: var(--weight-semi)">Dialog title</span></div>
+      <div class="ds-scale-row"><code>--text-lg</code><span style="font-size: var(--text-lg); font-weight: var(--weight-semi)">Question stem</span></div>
+      <div class="ds-scale-row"><code>--text-base</code><span style="font-size: var(--text-base)">Body and answer choices</span></div>
+      <div class="ds-scale-row"><code>--text-md</code><span style="font-size: var(--text-md); color: var(--ink-muted)">Secondary body, descriptions</span></div>
+      <div class="ds-scale-row"><code>--text-sm</code><span style="font-size: var(--text-sm); color: var(--ink-faint)">Metadata and helper text</span></div>
+      <div class="ds-scale-row" style="border-bottom: 0"><code>--text-xs</code><span class="tag tag-free">Tag</span></div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Space</h2>
+    <p class="ds-note">4px base. These tokens cover every gap, pad, and margin in the app.</p>
+    <div class="ds-panel">
+      <div class="ds-scale-row"><code>--space-1</code><div class="ds-bar" style="width: var(--space-1)"></div></div>
+      <div class="ds-scale-row"><code>--space-2</code><div class="ds-bar" style="width: var(--space-2)"></div></div>
+      <div class="ds-scale-row"><code>--space-3</code><div class="ds-bar" style="width: var(--space-3)"></div></div>
+      <div class="ds-scale-row"><code>--space-4</code><div class="ds-bar" style="width: var(--space-4)"></div></div>
+      <div class="ds-scale-row"><code>--space-5</code><div class="ds-bar" style="width: var(--space-5)"></div></div>
+      <div class="ds-scale-row"><code>--space-6</code><div class="ds-bar" style="width: var(--space-6)"></div></div>
+      <div class="ds-scale-row"><code>--space-8</code><div class="ds-bar" style="width: var(--space-8)"></div></div>
+      <div class="ds-scale-row"><code>--space-10</code><div class="ds-bar" style="width: var(--space-10)"></div></div>
+      <div class="ds-scale-row"><code>--space-14</code><div class="ds-bar" style="width: var(--space-14)"></div></div>
+      <div class="ds-scale-row" style="border-bottom: 0"><code>--space-18</code><div class="ds-bar" style="width: var(--space-18)"></div></div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Buttons</h2>
+    <p class="ds-note">
+      Two variants. Primary marks the single most likely next action; ghost is
+      everything else, including links styled as buttons.
+    </p>
+    <div class="ds-panel">
+      <div class="ds-row">
+        <button class="btn btn-primary">Submit answer</button>
+        <button class="btn btn-ghost">← All sets</button>
+        <a class="btn btn-ghost btn-calc" href="#">Desmos ↗</a>
+        <button class="btn btn-primary" disabled>Disabled</button>
+      </div>
+      <button class="linkish">Inline text button</button>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Tags &amp; badges</h2>
+    <div class="ds-panel ds-row" style="margin-bottom: 0">
+      <span class="tag tag-free">Free</span>
+      <span class="tag tag-locked">Locked</span>
+      <span class="owned-badge">3 sets</span>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Set cards</h2>
+    <div class="set-list">
+      <button class="set-card">
+        <div class="set-card-top">
+          <span class="set-title">Diagnostic Mini-Set</span>
+          <span class="tag tag-free">Free</span>
+        </div>
+        <p class="set-desc">Six mixed questions to see where you stand.</p>
+        <div class="set-meta">4 of 6 correct so far</div>
+      </button>
+
+      <button class="set-card locked">
+        <div class="set-card-top">
+          <span class="set-title">Algebra: Linear &amp; Quadratic</span>
+          <span class="tag tag-locked">Locked</span>
+        </div>
+        <p class="set-desc">Heart-of-algebra drilling — solving, systems, and function notation.</p>
+      </button>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Answer choices</h2>
+    <p class="ds-note">
+      Selection and result share one shape — only the hue changes — so the
+      transition after submitting never shifts the layout.
+    </p>
+    <div class="ds-panel">
+      <div class="q-choices">
+        <button class="choice"><span class="choice-label">A</span><span>Default, not yet chosen</span></button>
+        <button class="choice selected"><span class="choice-label">B</span><span>Selected, before submitting</span></button>
+        <button class="choice is-correct" disabled><span class="choice-label">C</span><span>Revealed as correct</span></button>
+        <button class="choice is-wrong" disabled><span class="choice-label">D</span><span>Chosen, and wrong</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Feedback</h2>
+    <div class="ds-panel">
+      <div class="feedback correct" style="margin-top: 0">
+        <p class="feedback-verdict">Correct</p>
+        <p class="feedback-explanation">3x = 15, so x = 5, and 6(5) + 5 = 35.</p>
+      </div>
+      <div class="feedback wrong">
+        <p class="feedback-verdict">Not quite — the answer is B.</p>
+        <p class="feedback-explanation">$40 is 80% of the original, so 0.80p = 40 and p = 50.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Celebration</h2>
+    <p class="ds-note">
+      Fires only on a correct answer. Roughly 600ms end to end — it runs dozens
+      of times per session, so anything longer starts costing the student time
+      rather than giving them a lift. Motion only: the result is fully legible
+      with animation disabled, and the whole thing is skipped under
+      <code>prefers-reduced-motion</code>.
+    </p>
+    <div class="ds-panel">
+      <div class="ds-row">
+        <button class="btn btn-primary" id="ds-replay">Replay</button>
+        <button class="btn btn-ghost" id="ds-replay-streak">Replay with streak</button>
+      </div>
+      <div class="q-choices" style="margin-bottom: var(--space-4)">
+        <button class="choice is-correct" id="ds-choice" disabled>
+          <span class="choice-label">C</span><span>The correct choice pops briefly</span>
+        </button>
+      </div>
+      <div class="feedback correct" id="ds-feedback" style="margin-top: 0">
+        <p class="feedback-verdict verdict-line" id="ds-verdict"></p>
+        <p class="feedback-explanation">The explanation reads normally underneath.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Question layout</h2>
+    <article class="question-card">
+      <p class="q-passage">
+        Octopuses are colorblind. They lack the photoreceptors that let most
+        animals distinguish one wavelength of light from another. ______ they
+        produce some of the most precise color camouflage in the animal kingdom.
+      </p>
+      <h2 class="q-stem">Which choice completes the text with the most logical transition?</h2>
+      <div class="q-choices">
+        <button class="choice"><span class="choice-label">A</span><span>Therefore,</span></button>
+        <button class="choice"><span class="choice-label">B</span><span>Nevertheless,</span></button>
+      </div>
+      <div class="question-actions">
+        <button class="btn btn-primary" disabled>Submit answer</button>
+      </div>
+      <p class="signin-nudge">You need an account to submit answers.</p>
+    </article>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Form fields</h2>
+    <div class="ds-panel" style="max-width: 380px">
+      <label class="field">
+        <span>Email</span>
+        <input type="email" placeholder="you@example.com" />
+      </label>
+      <p class="form-error">Invalid login credentials.</p>
+      <p class="form-notice" style="margin-bottom: 0">Check your email for a confirmation link.</p>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="ds-section">
+    <h2>Progress</h2>
+    <div class="ds-panel">
+      <div class="progress">
+        <span class="q-counter">Question 3 of 6</span>
+        <div class="progress-track"><div class="progress-bar" style="width: 33%"></div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  /* Mirrors celebrate() / renderVerdict() in public/app.js so the effect can
+     be reviewed without answering a question. If you tune the animation,
+     tune it in app.js — this is a preview harness, not the source. */
+  (function () {
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function burst(el) {
+      if (reduced.matches) return;
+      var r = el.getBoundingClientRect();
+      var wrap = document.createElement('div');
+      wrap.className = 'burst';
+      wrap.style.left = r.left + r.width / 2 + 'px';
+      wrap.style.top = r.top + r.height / 2 + 'px';
+      var palette = ['#1c6b46', '#1c5c4c', '#8fbfa6', '#c9a227', '#e8b4a0'];
+      for (var i = 0; i < 14; i++) {
+        var a = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.5;
+        var d = 44 + Math.random() * 44;
+        var p = document.createElement('i');
+        p.style.setProperty('--dx', Math.cos(a) * d + 'px');
+        p.style.setProperty('--dy', Math.sin(a) * d + 'px');
+        p.style.background = palette[i % palette.length];
+        p.style.animationDelay = Math.random() * 60 + 'ms';
+        wrap.appendChild(p);
+      }
+      document.body.appendChild(wrap);
+      setTimeout(function () { wrap.remove(); }, 1000);
+    }
+
+    function play(streak) {
+      var verdict = document.getElementById('ds-verdict');
+      var choice = document.getElementById('ds-choice');
+      var feedback = document.getElementById('ds-feedback');
+
+      verdict.textContent = '';
+      var badge = document.createElement('span');
+      badge.className = 'check-badge';
+      badge.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">' +
+                        '<path d="M2.5 6.2 L5 8.7 L9.5 3.6" /></svg>';
+      verdict.appendChild(badge);
+
+      var word = document.createElement('span');
+      word.textContent = streak >= 3 ? 'Nice streak!' : 'Correct!';
+      verdict.appendChild(word);
+
+      if (streak >= 2) {
+        var chip = document.createElement('span');
+        chip.className = 'streak-chip';
+        chip.textContent = streak + ' in a row';
+        verdict.appendChild(chip);
+      }
+
+      // Restart the CSS animations by reflowing the elements.
+      [choice, feedback].forEach(function (el) {
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+
+      burst(choice);
+    }
+
+    document.getElementById('ds-replay').addEventListener('click', function () { play(1); });
+    document.getElementById('ds-replay-streak').addEventListener('click', function () { play(4); });
+    play(1);
+  })();
+</script>
+
+</body>
+</html>

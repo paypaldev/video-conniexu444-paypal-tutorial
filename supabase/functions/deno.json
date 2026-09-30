@@ -1,0 +1,7 @@
+{
+  "//": "Deno config for the Edge Functions. Separate from the project's package.json, which belongs to the browser bundle — the functions share no dependencies with it.",
+  "nodeModulesDir": "auto",
+  "imports": {
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@^2.112.2"
+  }
+}
