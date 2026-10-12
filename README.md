@@ -1,5 +1,7 @@
 # KatSAT — katsat.org
 
+Create a free PayPal sandbox account at https://developer.paypal.com/sandbox-testing/accounts so you can follow along with the tutorial and try out the integration yourself.
+
 
 ## Community / troubleshooting
 
